@@ -1,0 +1,65 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+class FileReader{
+    string path;
+
+    public FileReader(string path){
+        this.path = path;
+    }
+
+    public IEnumerable<string> GetLines(){
+        using var stream = new FileStream(path, FileMode.Open);
+        StringBuilder builder = new StringBuilder();
+
+        while(stream.ReadByte() is int value && value >= 0){
+            builder.Append((char)value);
+            if(value == '\n'){
+                yield return builder.ToString();
+                builder.Clear();
+            }
+        }
+
+        yield return builder.ToString();
+        stream.Close();
+    }
+}
+
+#!csharp
+
+var fileReader = new FileReader("input.txt");
+
+#!csharp
+
+long max = 0;
+long count = 0;
+
+foreach(var line in fileReader.GetLines()){
+    long currentValue = 0;
+    switch (line.Trim()){
+        case "" : {
+            if(count > max){
+                max = count;
+            }
+            count = 0;
+            break;
+        }
+        default: {
+            if(long.TryParse(line, out currentValue)){
+                count += currentValue;
+            }
+            break;
+        }
+    }
+}
+
+max
+
+#!csharp
+
+"\nKappa\nByte".Trim()
