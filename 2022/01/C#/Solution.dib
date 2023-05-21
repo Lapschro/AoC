@@ -36,6 +36,7 @@ var fileReader = new FileReader("input.txt");
 
 #!csharp
 
+// First half
 long max = 0;
 long count = 0;
 
@@ -63,3 +64,32 @@ max
 #!csharp
 
 "\nKappa\nByte".Trim()
+
+#!csharp
+
+//Second Half Simple and easy to understand
+
+List<long> elves = new List<long>();
+
+long count = 0;
+
+foreach(var line in fileReader.GetLines()){
+    long currentValue = 0;
+    switch (line.Trim()){
+        case "" : {
+            elves.Add(count);
+            count = 0;
+            break;
+        }
+        default: {
+            if(long.TryParse(line, out currentValue)){
+                count += currentValue;
+            }
+            break;
+        }
+    }
+}
+
+
+elves.Sort();
+elves.TakeLast(3).Sum()
