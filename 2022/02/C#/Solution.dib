@@ -1,0 +1,117 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+class Solution{
+    string path;
+
+    Dictionary<string, int> points;
+
+
+    public Solution(string inputPath){
+        path = inputPath;
+        points = new Dictionary<string,int>{
+            {"X", 1},
+            {"Y", 2},
+            {"Z", 3}
+        };
+    }
+
+    public async Task<long> Solve(){
+        var fileLines = File.ReadLinesAsync(path);
+        long points = 0;
+
+        await foreach(var line in fileLines){
+            if(string.IsNullOrEmpty(line.Trim())){
+                break;
+            }
+
+            var standings = line.Trim().Split(" ");
+            var enemy = (int)(standings[0][0] - 'A');
+            var you = (int)(standings[1][0] - 'X');
+
+            points += you + 1;
+
+            if(you == enemy){
+                points += 3;
+            }
+            else if(((enemy + 1)%3) == you){
+                points += 6;
+            }
+        }
+
+        return points;
+    }
+}
+
+#!csharp
+
+var s = new Solution("input.txt");
+
+#!csharp
+
+await s.Solve()
+
+#!csharp
+
+//Part two
+
+#!csharp
+
+using System.IO;
+
+class Solution{
+    string path;
+
+    Dictionary<string, int> points;
+
+
+    public Solution(string inputPath){
+        path = inputPath;
+        points = new Dictionary<string,int>{
+            {"X", 1},
+            {"Y", 2},
+            {"Z", 3}
+        };
+    }
+
+    public async Task<long> Solve(){
+        var fileLines = File.ReadLinesAsync(path);
+        long points = 0;
+
+        await foreach(var line in fileLines){
+            if(string.IsNullOrEmpty(line.Trim())){
+                break;
+            }
+
+            var round = line.Trim().Split(" ");
+            var enemy = (int)(round[0][0] - 'A');
+
+            switch(round[1][0]){
+                case 'X': { //Lose
+                    points += ((enemy - 1 + 3 )%3) + 1;
+                    break;
+                }
+                case 'Y': { //Draw
+                    points += 3 + enemy + 1;
+                    break;
+                }
+                case 'Z': { //Win
+                    points += 6 + ((enemy + 1 + 3 )%3) + 1;
+                    break;
+                }
+            }
+        }
+
+        return points;
+    }
+}
+
+#!csharp
+
+var s = new Solution("input.txt");
+await s.Solve()
