@@ -1,0 +1,63 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+class Solution{
+    string path;
+    public Solution(string path){
+        this.path = path;
+    }
+
+    public async Task<long> Solve(){
+        long priorities = 0;
+
+        var fs = File.ReadLinesAsync(path);
+
+        await foreach(var line in fs){
+            if(line.Trim() == ""){
+                continue;
+            }
+
+            var trimmedLine= line.Trim();
+            var halfpoint = trimmedLine.Count()/2;
+            // Console.WriteLine(trimmedLine);
+            // Console.WriteLine(halfpoint);
+            // Console.WriteLine(trimmedLine.Substring(0,halfpoint));
+            // Console.WriteLine(trimmedLine.Substring(halfpoint));
+
+            HashSet<char> seenInFirst = new();
+            foreach(var c in trimmedLine.Substring(0,halfpoint)){
+                seenInFirst.Add(c);
+            }
+            foreach(var c in trimmedLine.Substring(halfpoint)){
+                if(seenInFirst.Contains(c)){
+                    AddPoints(c, ref priorities);
+                    break;
+                }
+            }
+        }
+
+        return priorities;
+    }
+
+    public void AddPoints(char item, ref long points){
+        switch((int)item - (int)'a'){
+            case < 0:{
+                points += (long)(item - 'A') + 27;
+                break;
+            }
+            case >= 0: {
+                points += (long)(item - 'a') + 1;
+                break;
+            }
+        }
+    }
+}
+
+#!csharp
+
+var s = new Solution("input.txt");
+await s.Solve()
