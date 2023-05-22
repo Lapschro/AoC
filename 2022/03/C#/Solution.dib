@@ -23,10 +23,6 @@ class Solution{
 
             var trimmedLine= line.Trim();
             var halfpoint = trimmedLine.Count()/2;
-            // Console.WriteLine(trimmedLine);
-            // Console.WriteLine(halfpoint);
-            // Console.WriteLine(trimmedLine.Substring(0,halfpoint));
-            // Console.WriteLine(trimmedLine.Substring(halfpoint));
 
             HashSet<char> seenInFirst = new();
             foreach(var c in trimmedLine.Substring(0,halfpoint)){
@@ -41,6 +37,76 @@ class Solution{
         }
 
         return priorities;
+    }
+
+    public void AddPoints(char item, ref long points){
+        switch((int)item - (int)'a'){
+            case < 0:{
+                points += (long)(item - 'A') + 27;
+                break;
+            }
+            case >= 0: {
+                points += (long)(item - 'a') + 1;
+                break;
+            }
+        }
+    }
+}
+
+#!csharp
+
+var s = new Solution("input.txt");
+await s.Solve()
+
+#!csharp
+
+using System.IO;
+class Solution{
+    string path;
+    public Solution(string path){
+        this.path = path;
+    }
+
+    public async Task<long> Solve(){
+        long priorities = 0;
+
+
+        await foreach(var lines in TakeGroup()){
+            HashSet<char> seenInFirst = new();
+            HashSet<char> seenInSecondAndInFirst = new();
+
+            foreach(var c in lines.ElementAt(0)){
+                seenInFirst.Add(c);
+            }
+            
+            foreach(var c in lines.ElementAt(1)){
+                if(seenInFirst.Contains(c)){
+                    seenInSecondAndInFirst.Add(c);
+                }
+            }
+            foreach(var c in lines.ElementAt(2)){
+                if(seenInSecondAndInFirst.Contains(c)){
+                    AddPoints(c, ref priorities);
+                    break;
+                }
+            }
+        }
+
+        return priorities;
+    }
+
+    public async IAsyncEnumerable<IEnumerable<string>> TakeGroup(){
+        var fs = File.ReadLinesAsync(path);
+
+        List<string> group = new ();
+        await foreach(var line in fs){
+            group.Add(line.Trim());
+            
+            if(group.Count == 3){
+                yield return group;
+                group.Clear();
+            }
+        }
     }
 
     public void AddPoints(char item, ref long points){
