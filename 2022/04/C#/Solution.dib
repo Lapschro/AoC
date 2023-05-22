@@ -1,0 +1,52 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+string path = "input.txt";
+
+#!csharp
+
+var fs = File.ReadLinesAsync(path);
+
+#!csharp
+
+long Clamp(int min, int max, int value){
+    if(value < min)
+        return min;
+    if(value > max)
+        return max;
+    return value;
+}
+
+#!csharp
+
+long count = 0;
+{
+    await foreach(var line in fs){
+        var pair = line.Trim().Split(",");
+        var pairOne = pair[0].Split("-").Select(x => int.Parse(x));
+        var pairTwo = pair[1].Split("-").Select(x => int.Parse(x));
+
+        if(pairOne.ElementAt(0) <= pairTwo.ElementAt(0)){
+            var diff = Clamp(0, 100, pairOne.ElementAt(1) - pairTwo.ElementAt(0) + 1);
+            if(diff > 0){
+                count++;
+            }
+            continue;
+        }
+        if(pairTwo.ElementAt(0) <= pairOne.ElementAt(0)){
+            var diff = Clamp(0, 100, pairTwo.ElementAt(1) - pairOne.ElementAt(0) + 1);
+            if(diff > 0){
+                count++;
+            }
+            continue;
+        }
+    }
+}
+count
