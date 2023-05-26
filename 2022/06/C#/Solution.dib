@@ -1,0 +1,11 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt")
