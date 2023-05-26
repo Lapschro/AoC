@@ -8,4 +8,45 @@ using System.IO;
 
 #!csharp
 
-var lines = File.ReadAllLines("input.txt")
+var lines = File.ReadAllLines("input.txt");
+
+#!csharp
+
+var line = lines[0];
+
+#!csharp
+
+//first half
+List<char> window = new List<char>();
+
+window.Add(line[0]);
+window.Add(line[1]);
+window.Add(line[2]);
+window.Add(line[3]);
+
+for(int i = 5; i < line.Count(); i++){
+    if(window.Distinct().Count() == 4){
+        Console.WriteLine(i);
+        break;
+    }
+    window.RemoveAt(0);
+    window.Add(line[i]);
+}
+
+#!csharp
+
+//first half
+List<char> window = new List<char>();
+
+for(int i = 0; i < 14; i++){
+    window.Add(line[i]);
+}
+
+for(int i = 14; i < line.Count(); i++){
+    if(window.Distinct().Count() == 14){
+        Console.WriteLine(i);
+        break;
+    }
+    window.RemoveAt(0);
+    window.Add(line[i]);
+}
