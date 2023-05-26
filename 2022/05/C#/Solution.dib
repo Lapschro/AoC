@@ -1,0 +1,165 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var reader = File.OpenRead("input.txt");
+IEnumerable<string> GetLines(FileStream reader){
+    StringBuilder builder = new StringBuilder();
+    byte[] b = new byte[1];
+    while(reader.Read(b,0,1) > 0){
+        if(b[0] == '\n'){
+            // System.Console.WriteLine(builder.ToString());
+            yield return builder.ToString();
+            builder.Clear();
+        }else{
+            builder.Append((char)b[0]);
+        }
+    }
+
+    reader.Close();
+    reader.Dispose();
+    if(builder.Length > 0)
+        yield return builder.ToString();
+    
+    yield break;
+}
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt");
+
+var statePortion = new List<string>();
+
+foreach(var line in lines){
+    Console.WriteLine(line);
+    if(string.IsNullOrEmpty(line.Trim())){
+        break;
+    }
+    statePortion.Add(line);
+}
+
+#!csharp
+
+statePortion
+
+#!csharp
+
+statePortion.Select(x => (x.Where((x, idx) => (idx-1)%4 == 0)))
+
+#!csharp
+
+var state = statePortion.Select(x => x.Where((x, idx) => (idx-1)%4 == 0)).ToList();
+
+#!csharp
+
+var stateStack = new List<Stack<char>>();
+for(int i = 0; i < 9; i++){
+    stateStack.Add(new Stack<char>());
+}
+
+for(int i = 7; i >= 0; i--){
+    for(int j = 0; j < 9; j++){
+        if(state.ElementAt(i).ElementAt(j) != ' ')
+            stateStack[j].Push(state.ElementAt(i).ElementAt(j));
+    }
+}
+
+#!csharp
+
+stateStack
+
+#!csharp
+
+"move 3 from 9 to 7".Split(" ").Where((x, idx) => idx%2==1).Select(x => int.Parse(x))
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt");
+
+for(int k = 10; k < lines.Count();k++){
+    var line = lines[k];
+    var trimmed = line.Trim();
+    var actions = trimmed.Split(" ").Where((x, idx) => idx%2 == 1).Select(x => int.Parse(x));
+    // Console.WriteLine("{0}, {1}, {2}", actions.ElementAt(0),actions.ElementAt(1),actions.ElementAt(2));
+    for(int i = 0 ; i < actions.ElementAt(0); i++){
+        if(stateStack[actions.ElementAt(1) - 1].Count > 0){
+            var val = stateStack[actions.ElementAt(1) - 1].Pop();
+            stateStack[actions.ElementAt(2) - 1].Push(val);
+        }
+    }
+}
+
+StringBuilder builder = new StringBuilder();
+
+stateStack.ForEach(x => {
+    builder.Append(x.Peek());
+});
+
+builder.ToString()
+
+#!csharp
+
+//Second half
+var lines = File.ReadAllLines("input.txt");
+
+for(int k = 10; k < lines.Count();k++){
+    var line = lines[k];
+    var trimmed = line.Trim();
+    if(string.IsNullOrEmpty(trimmed)){
+        continue;
+    }
+    var actions = trimmed.Split(" ").Where((x, idx) => idx%2 == 1).Select(x => int.Parse(x));
+    // Console.WriteLine("{0}, {1}, {2}", actions.ElementAt(0),actions.ElementAt(1),actions.ElementAt(2));
+
+    Stack<char> auxStack = new Stack<char>();
+    for(int i = 0 ; i < actions.ElementAt(0); i++){
+        if(stateStack[actions.ElementAt(1) - 1].Count > 0){
+            auxStack.Push(stateStack[actions.ElementAt(1) - 1].Pop());
+        }
+    }
+
+    while(auxStack.Count > 0){
+        stateStack[actions.ElementAt(2) - 1].Push(auxStack.Pop());
+    }
+}
+
+StringBuilder builder = new StringBuilder();
+
+stateStack.ForEach(x => {
+    builder.Append(x.Peek());
+});
+
+builder.ToString()
+
+#!csharp
+
+stateStack
+
+#!csharp
+
+reader.Close();
+reader.Dispose();
+
+#!csharp
+
+Stack<char> k1 = new Stack<char>();
+k1.Push('a');
+k1.Push('b');
+k1.Push('c');
+
+Stack<char> k2 = new Stack<char>();
+k2.Push(k1.Pop());
+k2.Push(k1.Pop());
+k2.Push(k1.Pop());
+
+k1.Push(k2.Pop());
+k1.Push(k2.Pop());
+k1.Push(k2.Pop());
+
+k1
