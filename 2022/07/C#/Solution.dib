@@ -10,6 +10,12 @@ using System.IO;
 
 var lines = File.ReadAllLines("input.txt");
 
+#!markdown
+
+For this one, I thought about doing it iteratively while reading the lines, first I've defined the "FileSystem" as a tree of folders and files. Where the folders will contain chidren and the size will be determined by the sum of all it's children sizes.
+Then for reading the lines I made two commands, to walk through the filesystem and creating the nodes.
+After that I created an aux function just to walk through the folders and add them to a list to be used to get the solutions.
+
 #!csharp
 
 enum FileType {
