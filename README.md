@@ -1,4 +1,4 @@
-**Advent of Code
+# Advent of Code
 
 Advent of code is a series of programming puzzles. You can find out more about it at [About Advent of Code](https://adventofcode.com/2022/about)
 
