@@ -1,0 +1,192 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt");
+
+#!csharp
+
+enum FileType {
+    FOLDER,
+    FILE
+}
+abstract class FileSystem {
+
+    public Dictionary<string, FileSystem> children;
+    public FileSystem parent;
+    public FileType type;
+
+    public FileSystem(FileSystem parent){
+        children = new Dictionary<string, FileSystem>();
+        this.parent = parent;
+    }
+
+    public abstract long GetSize();
+}
+
+#!csharp
+
+class FileType : FileSystem{
+    public string Name {get;set;}
+    public long Size {get;set;}
+    public FileType(int size, string name, FileSystem parent) : base(parent){
+        Size = size;
+        Name = name;
+    }
+
+    public override long GetSize(){
+        return this.Size;
+    }
+}
+
+class FolderType : FileSystem{
+    public string Name {get;set;}
+
+    public FolderType(string name, FileSystem parent) : base(parent) {
+        Name = name;
+    }
+
+    public override long GetSize(){
+        return children.Values.Sum(x => x.GetSize());
+    }
+}
+
+#!csharp
+
+interface ICommand{
+    FileSystem Act(FileSystem fileSystem);
+}
+
+class ChangeDirectoryCommand : ICommand{
+    public string NewLocation {get;set;}
+
+    public ChangeDirectoryCommand(string newFolder){
+        NewLocation = newFolder;        
+    }
+
+    public FileSystem Act(FileSystem fileSystem){
+        if(NewLocation == ".."){
+            return fileSystem.parent;
+        }
+        
+        if(!fileSystem.children.ContainsKey(NewLocation)){
+            fileSystem.children[NewLocation] = new FolderType(NewLocation, fileSystem);
+        }
+        return fileSystem.children[NewLocation];
+    }
+}
+
+#!csharp
+
+class ListCommand : ICommand{
+    public IEnumerable<string> Lines {get;set;}
+    public ListCommand(IEnumerable<string> lines){
+        Lines = lines;
+    }
+
+    public FileSystem Act(FileSystem fileSystem){
+        foreach(var line in Lines){
+            var content = line.Split(" ");
+            switch (content[0]) {
+                case "dir" : {
+                    fileSystem.children[content[1]] = new FolderType(content[1], fileSystem);
+                    break;
+                }
+                default: {
+                    fileSystem.children[content[1]] = new FileType(int.Parse(content[0]), content[1], fileSystem);
+                    break;
+                }
+            }
+        }
+
+        return fileSystem;
+    }
+}
+
+#!csharp
+
+FileSystem root = new FolderType("", null);
+FileSystem current = root;
+
+for(int i = 0; i < lines.Count(); i++){
+    var commandLine = lines.ElementAt(i);
+    var command = commandLine.Split(" ");
+
+    if(command[0] != "$"){
+        continue;
+    }
+
+    ICommand currentCommand = null;
+
+    switch (command[1]){
+        case "ls" : {
+            List<string> lsReturn = new ();
+            while((i + 1) < lines.Count() && !lines[i + 1].Contains("$")){
+                lsReturn.Add(lines[i + 1]);
+                i++;
+            }
+            currentCommand = new ListCommand(lsReturn);
+            break;
+        }
+        case "cd" : {
+            currentCommand = new ChangeDirectoryCommand(command[2]);
+            break;
+        }
+    }
+
+    current = currentCommand.Act(current);
+}
+
+#!csharp
+
+root.children["/"]
+
+#!csharp
+
+root.GetSize()
+
+#!csharp
+
+var listOfFolders = new List<FileSystem>();
+
+void SearchFolders(FileSystem fs, ref List<FileSystem> foldersResult){
+    foreach(var child in fs.children.Values){
+        if(child is FolderType ft){
+            foldersResult.Add(child);
+            SearchFolders(child, ref foldersResult);
+        }
+    }
+}
+
+SearchFolders(root, ref listOfFolders);
+
+#!csharp
+
+listOfFolders.Where(x => x.GetSize() <= 100000).Sum(x => x.GetSize())
+
+#!csharp
+
+long fileSystemSpace = 70000000;
+long availableSpace =  fileSystemSpace - root.GetSize();
+
+#!csharp
+
+availableSpace
+
+#!csharp
+
+long neededSpaceforUpdate =  30000000 - availableSpace;
+
+#!csharp
+
+neededSpaceforUpdate
+
+#!csharp
+
+listOfFolders.Where(x => x.GetSize() > neededSpaceforUpdate).OrderBy(x => x.GetSize()).First().GetSize()
