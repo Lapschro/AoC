@@ -1,0 +1,81 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt");
+
+#!csharp
+
+bool IsVisible(IEnumerable<int> array, int pos){
+    var tallestTree = -1;
+    for(int i = 0; i < array.Count(); i++){
+        Console.Write($"{array.ElementAt(i)}, ");
+        if(i == pos){
+            //Console.WriteLine(pos > tallestTree);
+            return array.ElementAt(i) > tallestTree;
+        }
+
+        if(array.ElementAt(i) > tallestTree){
+            tallestTree = array.ElementAt(i);
+        }
+    }
+    return false;
+}
+
+long CountVisible(IEnumerable<IEnumerable<int>> matrix){
+    long count = 0;
+
+    List<List<int>> columnList = new();
+
+    for(int i = 0; i < matrix.Count(); i++){
+        columnList.Add(new List<int>());
+        for(int j = 0; j < matrix.Count(); j++){
+            columnList[i].Add(matrix.ElementAt(j).ElementAt(i));
+        }
+    }
+
+    for(int i = 0; i < matrix.Count(); i++){
+        for(int j = 0; j < matrix.ElementAt(i).Count(); j++){
+            var isVisibleLeft = IsVisible(matrix.ElementAt(i), j);
+            var isVisibleRight = IsVisible(matrix.ElementAt(i).Reverse(), matrix.ElementAt(i).Count() - j - 1);
+            var isVisibleTop = IsVisible(columnList[j], i);
+            columnList[j].Reverse();
+            var isVisibleBottom = IsVisible(columnList[j], columnList[j].Count() - i - 1);
+            columnList[j].Reverse();
+
+            if(isVisibleBottom || isVisibleLeft || isVisibleRight || isVisibleTop){
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+#!csharp
+
+var matrix = lines.Select(x => x.ToList().Select(y => int.Parse($"{y}")));
+
+#!csharp
+
+var testMatrix = new []{
+    new []{3,0,3,7,3},
+    new []{2,5,5,1,2},
+    new []{6,5,3,3,2},
+    new []{3,3,5,4,9},
+    new []{3,5,3,9,0}
+};
+
+#!csharp
+
+CountVisible(matrix)
+
+#!csharp
+
+//Second half
