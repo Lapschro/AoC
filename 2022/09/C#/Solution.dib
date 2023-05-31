@@ -1,0 +1,168 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+class Rope{
+    public (int,int) HeadPosition {get;set;}
+    public (int,int) TailPosition {get;set;}
+
+    public HashSet<(int,int)> TailVisited;
+
+    float Distance((int, int) init, (int, int) end){
+        return MathF.Sqrt((end.Item1 - init.Item1)*(end.Item1 - init.Item1) + (end.Item2 - init.Item2)*(end.Item2 - init.Item2));
+    }
+
+    public Rope(){
+        HeadPosition = (0,0);
+        TailPosition = (0,0);
+        TailVisited = new();
+        TailVisited.Add((0,0));
+    }
+
+    public void MoveHead(char direction){
+        switch(direction){
+            case 'R': {
+                HeadPosition = (HeadPosition.Item1 + 1, HeadPosition.Item2);
+                if(Distance(HeadPosition, TailPosition) >= 2){
+                    TailPosition = (HeadPosition.Item1 - 1, HeadPosition.Item2);
+                    TailVisited.Add(TailPosition);
+                }
+                break;
+            }
+            case 'U': {
+                HeadPosition = (HeadPosition.Item1, HeadPosition.Item2 + 1);
+                if(Distance(HeadPosition, TailPosition) >= 2){
+                    TailPosition = (HeadPosition.Item1, HeadPosition.Item2 - 1);
+                    TailVisited.Add(TailPosition);
+                }
+                break;
+            }
+            case 'D': {
+                HeadPosition = (HeadPosition.Item1, HeadPosition.Item2 - 1);
+                if(Distance(HeadPosition, TailPosition) >= 2){
+                    TailPosition = (HeadPosition.Item1, HeadPosition.Item2 + 1);
+                    TailVisited.Add(TailPosition);
+                }
+                break;
+            }
+            case 'L': {
+                HeadPosition = (HeadPosition.Item1 - 1, HeadPosition.Item2);
+                if(Distance(HeadPosition, TailPosition) >= 2){
+                    TailPosition = (HeadPosition.Item1 + 1, HeadPosition.Item2);
+                    TailVisited.Add(TailPosition);
+                }
+                break;
+            }
+        }
+    }
+}
+
+#!csharp
+
+var lines = System.IO.File.ReadAllLines("input.txt");
+
+#!csharp
+
+var rope = new Rope();
+foreach(var line in lines){
+    if(string.IsNullOrEmpty(line.Trim())){
+        break;
+    }
+
+    var command = line.Trim().Split(" ");
+
+    for(int i = 0; i < int.Parse(command[1]); i++){
+        rope.MoveHead(command[0][0]);
+    }
+}
+
+rope.TailVisited.Count()
+
+#!csharp
+
+class Rope2{
+    List<(int,int)> Rope{get;set;}
+
+    public HashSet<(int,int)> TailVisited;
+
+    float Distance((int, int) init, (int, int) end){
+        return MathF.Sqrt((end.Item1 - init.Item1)*(end.Item1 - init.Item1) + (end.Item2 - init.Item2)*(end.Item2 - init.Item2));
+    }
+
+    public Rope2(){
+        TailVisited = new();
+        TailVisited.Add((0,0));
+        Rope = new();
+        for(int i = 0; i < 10; i++){
+            Rope.Add((0,0));
+        }
+    }
+
+    public void MoveHead(char direction){
+        switch(direction){
+            case 'R': {
+                Rope[0] = (Rope[0].Item1 + 1, Rope[0].Item2);
+                for(int i = 1; i < 10; i++){
+                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
+                        Rope[i] = (Rope[i-1].Item1 - 1, Rope[i-1].Item2);
+                        if(i == 9)
+                            TailVisited.Add(Rope[i]);
+                    }
+                }
+                break;
+            }
+            case 'U': {
+                Rope[0] = (Rope[0].Item1, Rope[0].Item2 + 1);
+                for(int i = 1; i < 10; i++){
+                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
+                        Rope[i] = (Rope[i - 1].Item1, Rope[i - 1].Item2 - 1);
+                        if(i == 9)
+                            TailVisited.Add(Rope[i]);
+                    }
+                }
+                break;
+            }
+            case 'D': {
+                Rope[0] = (Rope[0].Item1, Rope[0].Item2 - 1);
+                for(int i = 1; i < 10; i++){
+                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
+                        Rope[i] = (Rope[i - 1].Item1, Rope[i - 1].Item2 + 1);
+                        if(i == 9)
+                            TailVisited.Add(Rope[i]);
+                    }
+                }
+                break;
+            }
+            case 'L': {
+                Rope[0] = (Rope[0].Item1 -1, Rope[0].Item2);
+                for(int i = 1; i < 10; i++){
+                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
+                        Rope[i] = (Rope[i - 1].Item1 + 1, Rope[i - 1].Item2);
+                        if(i == 9)
+                            TailVisited.Add(Rope[i]);
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+#!csharp
+
+var rope2 = new Rope2();
+foreach(var line in lines){
+    if(string.IsNullOrEmpty(line.Trim())){
+        break;
+    }
+
+    var command = line.Trim().Split(" ");
+
+    for(int i = 0; i < int.Parse(command[1]); i++){
+        rope2.MoveHead(command[0][0]);
+    }
+}
+
+rope2.TailVisited.Count()
