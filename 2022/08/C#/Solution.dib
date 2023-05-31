@@ -74,8 +74,54 @@ var testMatrix = new []{
 
 #!csharp
 
-CountVisible(matrix)
+//Second half
+long GetScore(IEnumerable<int> values, int pos){
+    var count = 0;
+    var currentHeight = values.ElementAt(pos);
+
+    for(int i = pos + 1; i < values.Count(); i++){
+        count++;
+        if(currentHeight <= values.ElementAt(i)){
+            break;
+        }
+    }
+
+    return count;
+}
+
+
+long CountVisible(IEnumerable<IEnumerable<int>> matrix){
+    long count = 0;
+
+    List<List<int>> columnList = new();
+
+    for(int i = 0; i < matrix.Count(); i++){
+        columnList.Add(new List<int>());
+        for(int j = 0; j < matrix.Count(); j++){
+            columnList[i].Add(matrix.ElementAt(j).ElementAt(i));
+        }
+    }
+
+    for(int i = 0; i < matrix.Count(); i++){
+        for(int j = 0; j < matrix.ElementAt(i).Count(); j++){
+            var isVisibleLeft = GetScore(matrix.ElementAt(i), j);
+            var isVisibleRight = GetScore(matrix.ElementAt(i).Reverse(), matrix.ElementAt(i).Count() - j - 1);
+            var isVisibleTop = GetScore(columnList[j], i);
+            columnList[j].Reverse();
+            var isVisibleBottom = GetScore(columnList[j], columnList[j].Count() - i - 1);
+            columnList[j].Reverse();
+
+            var score = isVisibleBottom * isVisibleLeft * isVisibleRight * isVisibleTop;
+            if(count < score){
+                Console.WriteLine($"{isVisibleLeft} * {isVisibleRight} * {isVisibleTop} * {isVisibleBottom} = {score}");
+                count = score;
+            }
+        }
+    }
+
+    return count;
+}
 
 #!csharp
 
-//Second half
+CountVisible(matrix)
