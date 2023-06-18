@@ -83,7 +83,7 @@ rope.TailVisited.Count()
 #!csharp
 
 class Rope2{
-    List<(int,int)> Rope{get;set;}
+    public List<(int,int)> Rope{get;set;}
 
     public HashSet<(int,int)> TailVisited;
 
@@ -91,58 +91,84 @@ class Rope2{
         return MathF.Sqrt((end.Item1 - init.Item1)*(end.Item1 - init.Item1) + (end.Item2 - init.Item2)*(end.Item2 - init.Item2));
     }
 
-    public Rope2(){
+    (int, int) Diff((int, int) A, (int, int) B){
+        return (B.Item1 - A.Item1, B.Item2 - A.Item2);
+    }
+
+    public Rope2(int size){
         TailVisited = new();
         TailVisited.Add((0,0));
         Rope = new();
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < size; i++){
             Rope.Add((0,0));
         }
+    }
+
+    public void MoveRope(int i){
+        var diff = Diff(Rope[i], Rope[i - 1]);
+
+        if( Math.Abs(diff.Item1) > 2 || Math.Abs(diff.Item2) > 2){
+            Console.WriteLine(i); 
+            Console.WriteLine(diff);
+            throw new Exception("wtf");
+        }
+
+        Rope[i] = diff switch {
+            (2, 0) => (Rope[i].Item1 + 1, Rope[i].Item2),
+            (-2, 0) => (Rope[i].Item1 - 1, Rope[i].Item2),
+            (0, 2) => (Rope[i].Item1, Rope[i].Item2 + 1),
+            (0, -2) => (Rope[i].Item1, Rope[i].Item2 - 1),
+            (2, 1) => (Rope[i].Item1 + 1, Rope[i].Item2 + 1),
+            (-2, 1) => (Rope[i].Item1 - 1, Rope[i].Item2 + 1),
+            (2, -1) => (Rope[i].Item1 + 1, Rope[i].Item2 - 1),
+            (-2, -1) => (Rope[i].Item1 - 1, Rope[i].Item2 - 1),
+            (1, 2) => (Rope[i].Item1 + 1, Rope[i].Item2 + 1),
+            (1, -2) => (Rope[i].Item1 + 1, Rope[i].Item2 - 1),
+            (-1, 2) => (Rope[i].Item1 - 1, Rope[i].Item2 + 1),
+            (-1, -2) => (Rope[i].Item1 - 1, Rope[i].Item2 - 1),
+            (2, 2) => (Rope[i].Item1 + 1, Rope[i].Item2 + 1),
+            (-2, 2) => (Rope[i].Item1 - 1, Rope[i].Item2 + 1),
+            (2, -2) => (Rope[i].Item1 + 1, Rope[i].Item2 - 1),
+            (-2, -2) => (Rope[i].Item1 - 1, Rope[i].Item2 - 1),
+            _ => Rope[i]
+        };
     }
 
     public void MoveHead(char direction){
         switch(direction){
             case 'R': {
                 Rope[0] = (Rope[0].Item1 + 1, Rope[0].Item2);
-                for(int i = 1; i < 10; i++){
-                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
-                        Rope[i] = (Rope[i-1].Item1 - 1, Rope[i-1].Item2);
-                        if(i == 9)
-                            TailVisited.Add(Rope[i]);
-                    }
+                for(int i = 1; i < Rope.Count; i++){
+                    MoveRope(i);
+                    if(i == Rope.Count - 1)
+                        TailVisited.Add(Rope[i]);
                 }
                 break;
             }
             case 'U': {
                 Rope[0] = (Rope[0].Item1, Rope[0].Item2 + 1);
-                for(int i = 1; i < 10; i++){
-                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
-                        Rope[i] = (Rope[i - 1].Item1, Rope[i - 1].Item2 - 1);
-                        if(i == 9)
-                            TailVisited.Add(Rope[i]);
-                    }
+                for(int i = 1; i < Rope.Count; i++){
+                    MoveRope(i);
+                    if(i == Rope.Count - 1)
+                        TailVisited.Add(Rope[i]);
                 }
                 break;
             }
             case 'D': {
                 Rope[0] = (Rope[0].Item1, Rope[0].Item2 - 1);
-                for(int i = 1; i < 10; i++){
-                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
-                        Rope[i] = (Rope[i - 1].Item1, Rope[i - 1].Item2 + 1);
-                        if(i == 9)
-                            TailVisited.Add(Rope[i]);
-                    }
+                for(int i = 1; i < Rope.Count; i++){
+                    MoveRope(i);
+                    if(i == Rope.Count - 1)
+                        TailVisited.Add(Rope[i]);
                 }
                 break;
             }
             case 'L': {
                 Rope[0] = (Rope[0].Item1 -1, Rope[0].Item2);
-                for(int i = 1; i < 10; i++){
-                    if(Distance(Rope[i - 1], Rope[i]) >= 2){
-                        Rope[i] = (Rope[i - 1].Item1 + 1, Rope[i - 1].Item2);
-                        if(i == 9)
-                            TailVisited.Add(Rope[i]);
-                    }
+                for(int i = 1; i < Rope.Count; i++){
+                    MoveRope(i);
+                    if(i == Rope.Count - 1)
+                        TailVisited.Add(Rope[i]);
                 }
                 break;
             }
@@ -152,7 +178,7 @@ class Rope2{
 
 #!csharp
 
-var rope2 = new Rope2();
+var rope2 = new Rope2(10);
 foreach(var line in lines){
     if(string.IsNullOrEmpty(line.Trim())){
         break;
@@ -160,9 +186,18 @@ foreach(var line in lines){
 
     var command = line.Trim().Split(" ");
 
-    for(int i = 0; i < int.Parse(command[1]); i++){
-        rope2.MoveHead(command[0][0]);
+    try{
+        for(int i = 0; i < int.Parse(command[1]); i++){
+            rope2.MoveHead(command[0][0]);
+        }
+    }catch(Exception e){
+        Console.WriteLine(line);
+        throw;
     }
 }
 
 rope2.TailVisited.Count()
+
+#!csharp
+
+var values = rope2.Rope;
