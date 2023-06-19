@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 #!csharp
 
-var lines = File.ReadAllLines("example.txt");
+var lines = File.ReadAllLines("input.txt");
 
 #!csharp
 
@@ -31,11 +31,8 @@ class Solution{
                 "noop" => (1, this.signal),
             });
             cycle += cycles;
-            signalsAt.Where(x => cycleBefore <= x && x <= cycle).ToList().ForEach(x => {
-                if(x == cycle)
-                    result += x*signal;
-                else
-                    result += x*newSignal;
+            signalsAt.Where(x => cycleBefore < x && x <= cycle).ToList().ForEach(x => {
+                result += x*signal;
             }); 
             this.signal = newSignal;
         }
@@ -51,3 +48,50 @@ var solver = new Solution();
 #!csharp
 
 solver.Solve(lines)
+
+#!csharp
+
+class Solution2{
+    public List<int> signalsAt = new List<int> {40,80,120,160,200,240};
+
+    int signal = 1;
+
+    public int Solve(string[] lines){
+        int cycle = 0;
+        int result = 0;
+
+        foreach(var line in lines){
+            var command = line.Split(" ");
+            int cycleBefore = cycle;
+            var (cycles, newSignal) = (command[0] switch {
+                "addx" => (2, this.signal + int.Parse(command[1])),
+                "noop" => (1, this.signal),
+            });
+
+            for(int i = 0; i < cycles; i++){
+                signalsAt.Where(x => x == cycle).ToList().ForEach(x => {
+                    System.Console.WriteLine();
+                }); 
+                cycle++;
+                var value = (signal - (cycle%40));
+                if(value <= 0 && value > -3){
+                    System.Console.Write("#");
+                }else{
+                    System.Console.Write(".");
+                }
+            }
+
+            this.signal = newSignal;
+        }
+
+        return result;
+    }
+}
+
+#!csharp
+
+var solver2 = new Solution2();
+
+#!csharp
+
+solver2.Solve(lines)
