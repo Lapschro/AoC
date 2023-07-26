@@ -9,3 +9,155 @@ using System.IO;
 #!csharp
 
 var lines = File.ReadAllLines("input.txt");
+
+#!csharp
+
+lines
+
+#!csharp
+
+class Monkey{
+    public int number;
+    public List<int> items;
+    public Func<int,int> operation;
+    public int condition;
+    public int trueMonkey;
+    public int falseMonkey;
+    public long inspections;
+
+    public Monkey(string[] instructions){
+        inspections = 0;
+        number = int.Parse(instructions[0].Split(" ")[1].Replace(":", ""));
+        items = instructions[1].Replace(" ", "").Split(":")[1].Split(",").Select(x => int.Parse(x)).ToList();
+        var function = instructions[2].Replace(" ", "").Split("=").Last();
+        operation = function[3] switch {
+            '+' => (x) => x + (function.Split("+").Last().Trim() == "old" ? x : int.Parse(function.Split("+").Last())),
+            '*' => (x) => x * (function.Split("*").Last().Trim() == "old" ? x : int.Parse(function.Split("*").Last())),
+            _ => throw new Exception("Invalid operator")
+        };
+
+        condition = int.Parse(instructions[3].Replace(" ", "").Split("by").Last());
+        trueMonkey = int.Parse(instructions[4].Replace(" ", "").Split("monkey").Last());
+        falseMonkey = int.Parse(instructions[5].Replace(" ", "").Split("monkey").Last());
+    }
+
+}
+
+#!csharp
+
+var instructions = lines.Where(x => !string.IsNullOrEmpty(x)).ToList();
+
+#!csharp
+
+var monkeys = new List<Monkey>();
+
+#!csharp
+
+while(instructions.Count >= 6){
+    var l = instructions.Take(6);
+    monkeys.Add(new Monkey(l.ToArray()));
+ 
+    instructions = instructions.Skip(6).ToList();
+}
+
+#!csharp
+
+int rounds = 20;
+for(int i = 0; i < rounds; i++){
+    foreach(var monkey in monkeys){
+        while(monkey.items.Count > 0){
+            var item = monkey.items.First();
+            monkey.items = monkey.items.Skip(1).ToList();
+            monkey.inspections++;
+            item = monkey.operation(item);
+            item /=3;
+            if((item% monkey.condition) == 0){
+                monkeys[monkey.trueMonkey].items.Add(item);
+            }else{
+                monkeys[monkey.falseMonkey].items.Add()
+            }
+        }
+    }
+}
+
+#!csharp
+
+monkeys.OrderByDescending(x => x.inspections).Take(2).Aggregate((long)1, (acc, x) => acc*x.inspections)
+
+#!csharp
+
+monkeys
+
+#!csharp
+
+class Monkey2{
+    public int number;
+    public List<long> items;
+    public Func<long,long> operation;
+    public int condition;
+    public int trueMonkey;
+    public int falseMonkey;
+    public long inspections;
+
+    public Monkey2(string[] instructions){
+        inspections = 0;
+        number = int.Parse(instructions[0].Split(" ")[1].Replace(":", ""));
+        items = instructions[1].Replace(" ", "").Split(":")[1].Split(",").Select(x => long.Parse(x)).ToList();
+        var function = instructions[2].Replace(" ", "").Split("=").Last();
+        operation = function[3] switch {
+            '+' => (x) => x + (function.Split("+").Last().Trim() == "old" ? x : long.Parse(function.Split("+").Last())),
+            '*' => (x) => x * (function.Split("*").Last().Trim() == "old" ? x :long.Parse(function.Split("*").Last())),
+            _ => throw new Exception("Invalid operator")
+        };
+
+        condition = int.Parse(instructions[3].Replace(" ", "").Split("by").Last());
+        trueMonkey = int.Parse(instructions[4].Replace(" ", "").Split("monkey").Last());
+        falseMonkey = int.Parse(instructions[5].Replace(" ", "").Split("monkey").Last());
+    }
+
+}
+
+#!csharp
+
+var instructions = lines.Where(x => !string.IsNullOrEmpty(x)).ToList();
+
+#!csharp
+
+var monkeys = new List<Monkey2>();
+
+#!csharp
+
+while(instructions.Count >= 6){
+    var l = instructions.Take(6);
+    monkeys.Add(new Monkey2(l.ToArray()));
+ 
+    instructions = instructions.Skip(6).ToList();
+}
+
+#!csharp
+
+long divisor = monkeys.Aggregate(1, (acc,x) => acc*x.condition);
+
+#!csharp
+
+int rounds = 10000;
+for(int i = 0; i < rounds; i++){
+    foreach(var monkey in monkeys){
+        while(monkey.items.Count > 0){
+            var item = monkey.items.First();
+            monkey.items = monkey.items.Skip(1).ToList();
+            monkey.inspections++;
+            item = monkey.operation(item);
+            item %= divisor;
+            if((item % monkey.condition) == 0){
+                monkeys[monkey.trueMonkey].items.Add(item);
+            }else{
+                monkeys[monkey.falseMonkey].items.Add(item);
+            }
+        }
+    }
+}
+
+#!csharp
+
+monkeys.OrderByDescending(x => x.inspections).Take(2).Aggregate((long)1, (acc, x) => acc*x.inspections)
