@@ -1,0 +1,116 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var input = File.ReadAllText("input.txt");
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+#!csharp
+
+Dictionary<string, int> dict = new Dictionary<string, int>();
+dict["red"] = 12;
+dict["green"] = 13;
+dict["blue"] = 14;
+
+#!csharp
+
+var sampleInput = @"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
+
+#!csharp
+
+var res = 0;
+
+foreach (var line in input.Split(Environment.NewLine))
+{
+    var gameSets = line.Split(":");
+
+    int game = int.Parse($"{Regex.Replace(gameSets.First(), "[^0-9]", "")}");
+
+    var possible = true;
+
+    foreach(var set in gameSets.Last().Split(';')){
+        Dictionary<string, int> gameDict = new Dictionary<string, int>();
+        gameDict["red"] = 0;
+        gameDict["green"] = 0;
+        gameDict["blue"] = 0;
+
+        var commands = set.Split(',');
+        foreach(var command in commands){
+            var count = int.Parse($"{Regex.Replace(command, "[^0-9]", "")}");
+            var type = $"{Regex.Replace(command, "[^a-zA-Z]", "")}";
+
+            gameDict[type] += count;
+        }
+
+        foreach(var key in gameDict.Keys){
+            if(gameDict[key] > dict[key]){
+                possible = false;
+                break;
+            }
+        }
+
+        if(!possible){
+            break;
+        }
+    }
+    if(possible){
+        res += game;
+    }
+}
+
+res
+
+#!csharp
+
+var res = 0;
+
+foreach (var line in input.Split(Environment.NewLine))
+{
+    var gameSets = line.Split(":");
+
+    int game = int.Parse($"{Regex.Replace(gameSets.First(), "[^0-9]", "")}");
+
+    var greatest = new Dictionary<string, int>();
+    greatest["red"] = 0;
+    greatest["green"] = 0;
+    greatest["blue"] = 0;    
+
+    foreach(var set in gameSets.Last().Split(';')){
+        Dictionary<string, int> gameDict = new Dictionary<string, int>();
+        gameDict["red"] = 0;
+        gameDict["green"] = 0;
+        gameDict["blue"] = 0;
+
+        var commands = set.Split(',');
+        foreach(var command in commands){
+            var count = int.Parse($"{Regex.Replace(command, "[^0-9]", "")}");
+            var type = $"{Regex.Replace(command, "[^a-zA-Z]", "")}";
+
+            gameDict[type] += count;
+        }
+
+        foreach(var key in gameDict.Keys){
+            if(gameDict[key] > greatest[key]){
+                greatest[key] = gameDict[key];
+            }
+        }
+    }
+
+    var power = greatest.Values.Aggregate(1, (x, acc) => x*acc);
+    res+=power;
+}
+
+res
