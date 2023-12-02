@@ -1,0 +1,102 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+var sampleInput = @"two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+twoneight2";
+
+#!csharp
+
+var sampleInput2 = @"1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet";
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+#!csharp
+
+using System.IO;
+
+var input = File.ReadAllText("input.txt");
+
+#!csharp
+
+List<string> numbers = new List<string>();
+foreach(var line in input.Split(Environment.NewLine))
+{
+    numbers.Add(Regex.Replace(line, "[^0-9]", ""));    
+}
+
+#!csharp
+
+numbers.Select(x => int.Parse($"{x[0]}{x.Last()}")).Sum()
+
+#!csharp
+
+foreach(var number in numbers)
+{
+    Console.WriteLine($"{number[0]}{number.Last()}");
+}
+
+#!csharp
+
+Dictionary<string, int> numbersDictionary = new Dictionary<string, int>();
+numbersDictionary.Add("one", 1);
+numbersDictionary.Add("two", 2);
+numbersDictionary.Add("three", 3);
+numbersDictionary.Add("four", 4);
+numbersDictionary.Add("five", 5);
+numbersDictionary.Add("six", 6);
+numbersDictionary.Add("seven", 7);
+numbersDictionary.Add("eight", 8);
+numbersDictionary.Add("nine", 9);
+
+var secondList = new List<string>();
+
+foreach(var line in input.Split(Environment.NewLine))
+{
+    string lineCopy = line;
+    StringBuilder sb = new StringBuilder();
+
+    for(int i = 0 ; i < lineCopy.Length; i++)
+    {
+        var substrStart = lineCopy.Substring(i);
+        if(substrStart[0] > '0' && substrStart[0] <= '9')
+        {
+            sb.Append(substrStart[0]);
+            continue;
+        }
+        
+        foreach(var number in numbersDictionary)
+        {
+            if(substrStart.StartsWith(number.Key))
+            {
+                sb.Append(number.Value.ToString());
+                break;
+            }
+        }
+    }
+
+    secondList.Add(sb.ToString());
+}
+
+secondList.Select(x => int.Parse($"{x.First()}{x.Last()}")).Sum()
+
+#!csharp
+
+secondList.Select(x => int.Parse($"{x.First()}{x.Last()}")).Sum()
+
+#!csharp
+
+secondList.ForEach(Console.WriteLine)
