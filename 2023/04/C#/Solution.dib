@@ -1,0 +1,94 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var input = File.ReadAllText("input.txt");
+
+#!csharp
+
+IEnumerable<string> GetLine(string[] input){
+    foreach(var line in input){
+        yield return line;
+    }
+}
+
+#!csharp
+
+var res = 0.0;
+
+foreach(var line in GetLine(input.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray<string>())){
+    var commands = line.Split(":");
+    var numbers = commands[1].Split("|").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()).ToArray();
+
+    var selectedNumbers = numbers[0].Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x.Trim())).ToHashSet();
+    int found = 0;
+    
+    foreach(var n in numbers[1].Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x.Trim()))){
+        if(selectedNumbers.Contains(n)){
+            found++;
+        }
+    }
+
+    if(found > 0){
+        res += Math.Pow(2.0, (double)found - 1.0);
+    }
+}
+
+res
+
+#!markdown
+
+# part 2
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+#!csharp
+
+var res = 0.0;
+
+Dictionary<int, int> scratchpads = new();
+
+var lines = input.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray<string>();
+
+for(int i = 0; i < lines.Length; i++){
+    var commands = lines[i].Split(":");
+
+    if(!scratchpads.ContainsKey(i)){
+        scratchpads.Add(i, 0);
+    }
+
+    scratchpads[i]++;
+
+    var numbers = commands[1].Split("|").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()).ToArray();
+
+    var selectedNumbers = numbers[0].Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x.Trim())).ToHashSet();
+    int found = 0;
+    
+    foreach(var n in numbers[1].Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x.Trim()))){
+        if(selectedNumbers.Contains(n)){
+            found++;
+        }
+    }
+
+    for(int j = 1; j <= found; j++){
+        if(i + j >= lines.Length){
+            break;
+        }
+
+        if(!scratchpads.ContainsKey(i + j)){
+            scratchpads.Add(i + j, scratchpads[i]);
+        }else{
+            scratchpads[i + j] += scratchpads[i];
+        }
+    }
+}
+
+scratchpads.Values.Sum()
