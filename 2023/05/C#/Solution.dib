@@ -1,0 +1,176 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+string example = @"seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4";
+
+#!csharp
+
+string[] input = File.ReadAllLines("input.txt");
+
+// string[] input = example.Split("\n");
+
+#!csharp
+
+class Mapping{
+    public long FromStart{get;set;}
+    public long ToStart {get;set;}
+    public long Range {get;set;}
+    public long Depth {get;set;}
+
+    public bool InRange(long value){
+        return value >= FromStart && value < (FromStart + Range);
+    }
+
+    public long Map(long value){
+        return ToStart + (value - FromStart);
+    }
+}
+
+#!csharp
+
+string seeds = input[0];
+
+#!csharp
+
+List<List<Mapping>> mappings = new List<List<Mapping>>();
+
+for(int i = 2; i < input.Length; i++){
+    if(string.IsNullOrWhiteSpace(input[i])){
+        continue;
+    }
+
+    if(input[i].Contains(":")){
+        Console.WriteLine(input[i]);
+        mappings.Add(new List<Mapping>());
+        continue;
+    }
+
+    var numbers = input[i].Split(" ").Select(x => long.Parse(x)).ToList();
+
+    Console.WriteLine(string.Join(" ", numbers));
+
+    mappings.Last().Add(new Mapping(){
+        FromStart = numbers[1],
+        ToStart = numbers[0],
+        Range = numbers[2],
+        Depth = mappings.Count
+    });
+}
+
+#!csharp
+
+var seedsNumbers = seeds.Split(": ").Last().Split(" ").Select(x => long.Parse(x)).ToList();
+
+#!csharp
+
+foreach(var seed in seedsNumbers){
+    Stack<Mapping> mappingStack = new Stack<Mapping>();
+
+    foreach(var mapping in mappings[0]){
+        if(mapping.InRange(seed)){
+            mappingStack.Push(mapping);
+        }
+    }
+
+    if(mappingStack.Count == 0){
+        continue;
+    }
+    var currentSeed = seed;
+    while(mappingStack.Count > 0){
+        var mapping = mappingStack.Pop();
+
+        if(mapping.Depth == mappings.Count){
+            Console.WriteLine(mapping.Map(currentSeed));
+            break;
+        }else{
+            foreach(var nextMapping in mappings[(int)mapping.Depth]){
+                if(nextMapping.InRange(mapping.Map(currentSeed))){
+                    Console.WriteLine(nextMapping.Map(currentSeed));
+                    mappingStack.Push(nextMapping);
+                }
+            }
+        }
+    }
+}
+
+#!csharp
+
+foreach(var seed in seedsNumbers){
+    var currentSeed = seed;
+    for(int i = 0; i < mappings.Count; i++){
+        foreach(var mapping in mappings[i]){
+            if(mapping.InRange(currentSeed)){
+                currentSeed = mapping.Map(currentSeed);
+                // Console.WriteLine("i: " + i + " Mapped from " + seed + " to " + currentSeed);
+                break;
+            }
+        }
+        // Console.WriteLine(currentSeed);
+    }
+
+    Console.WriteLine(currentSeed);
+}
+
+#!csharp
+
+// Dictionary<long, long> seedCache = new Dictionary<long, long>();
+
+long lowest = long.MaxValue;
+
+for(int i = 0; i < seedsNumbers.Count; i+=2){
+    long seedStart = seedsNumbers[i];
+    long seedRange = seedsNumbers[i+1];
+
+    for(long j = 0; j < seedRange; j++){
+        var currentSeed = seedStart + j;
+            for(int k = 0; k < mappings.Count; k++){
+                foreach(var mapping in mappings[k]){
+                    if(mapping.InRange(currentSeed)){
+                        currentSeed = mapping.Map(currentSeed);
+                        // Console.WriteLine("i: " + i + " Mapped from " + seed + " to " + currentSeed);
+                        break;
+                    }
+                }
+            }
+        lowest = Math.Min(lowest, currentSeed);
+    }
+}
