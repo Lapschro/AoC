@@ -1,0 +1,67 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+(int, int) SplitLines(string line){
+    var split = line.Split(" ");
+    return (int.Parse(split.First()), int.Parse(split.Last()));
+}
+
+#!csharp
+
+var lines = File.ReadAllLines("input.txt");
+
+#!csharp
+
+var numberPairs = lines.Where(x => !String.IsNullOrEmpty(x)).Select(x => SplitLines(x));
+
+List<int> leftList = new();
+List<int> rightList = new();
+
+foreach(var (l,r) in numberPairs){
+    leftList.Add(l);
+    rightList.Add(r);
+}
+
+leftList.Sort();
+rightList.Sort();
+
+#!csharp
+
+int diff = 0;
+for(int i = 0; i < leftList.Count; i++){
+    diff += Math.Abs(leftList[i] - rightList[i]);
+}
+
+diff
+
+#!csharp
+
+Dictionary<int, int> rightAppearances = new();
+
+#!csharp
+
+foreach(var r in rightList){
+    if(!rightAppearances.ContainsKey(r)){
+        rightAppearances[r] = 0;
+    }
+
+    rightAppearances[r]++;
+}
+
+#!csharp
+
+long appearaces = 0;
+foreach(var l in leftList){
+    if(rightAppearances.ContainsKey(l)){
+        appearaces += l * rightAppearances[l];
+    }
+}
+
+appearaces

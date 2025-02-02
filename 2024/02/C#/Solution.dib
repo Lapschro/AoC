@@ -1,0 +1,108 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+bool isSafe(IEnumerable<int> report){
+    bool isIncreasing = true;
+    int current = report.ElementAt(0);
+    if(current > report.ElementAt(1)){
+        isIncreasing = false;
+    }
+
+    for(int i = 1; i < report.Count(); i++){
+        int a = report.ElementAt(i);
+
+        if(isIncreasing && a <= current){
+            return false;
+        }else if(!isIncreasing && a >= current){
+            return false;
+        }
+
+        int diff = Math.Abs(a - current);
+        if(diff < 1 || diff > 3){
+            return false;
+        }
+        
+        current = report.ElementAt(i);
+    }
+
+    return true;
+}
+
+#!csharp
+
+string test_entry = @"7 6 4 2 1
+1 2 7 8 9
+9 7 6 2 1
+1 3 2 4 5
+8 6 4 4 1
+1 3 6 7 9";
+
+#!csharp
+
+test_entry.Split("\n").Select(x => isSafe(x.Split(" ").Select(y => int.Parse(y)))).Aggregate(0, (acc, x) => x ? acc + 1  : acc)
+
+#!csharp
+
+var file = File.ReadAllLines("input.txt");
+
+#!csharp
+
+file.Select(x => isSafe(x.Split(" ").Select(y => int.Parse(y)))).Aggregate(0, (acc, x) => x ? acc + 1  : acc)
+
+#!csharp
+
+bool isSafeWithOneError(IEnumerable<int> report){
+    bool isIncreasing = true;
+    int current = report.ElementAt(0);
+    if(current > report.ElementAt(1)){
+        isIncreasing = false;
+    }
+
+    bool second_pass = false;
+
+    for(int i = 1; i < report.Count(); i++){
+        int a = report.ElementAt(i);
+
+        bool has_error = false;
+        if(isIncreasing && a <= current){
+            has_error = true;
+        }else if(!isIncreasing && a >= current){
+            has_error = true;
+        }
+
+        int diff = Math.Abs(a - current);
+        if(diff < 1 || diff > 3){
+            has_error = true;
+        }
+        
+        if(has_error){
+            second_pass = true;
+            break;
+        }
+        
+        current = report.ElementAt(i);
+    }
+
+    if(!second_pass){
+        return true;
+    }
+
+    for(int i = 0; i < report.Count(); i++){
+        if(isSafe(report.Where((x, idx) => idx != i))){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+#!csharp
+
+file.Select(x => isSafeWithOneError(x.Split(" ").Select(y => int.Parse(y)))).Aggregate(0, (acc, x) => x ? acc + 1  : acc)
