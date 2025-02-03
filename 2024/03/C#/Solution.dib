@@ -1,0 +1,93 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+#!csharp
+
+var expr = new Regex("mul\\([0-9][0-9]?[0-9]?[,][0-9][0-9]?[0-9]?\\)");
+
+#!csharp
+
+expr.Matches("mul(1,2)askjdhkjashdkjahsdmul(321,3211)")
+
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+var input = File.ReadAllLines("input.txt");
+
+#!csharp
+
+"mul(2,2)".Split(@"mul(").Last().Split(")").First().Split(",").Select(x => long.Parse(x)).Aggregate((long)1, (acc, x) => acc*x)
+
+#!csharp
+
+long multiply(string expr){
+    return expr.Split(@"mul(").Last().Split(")").First().Split(",").Select(x => int.Parse(x)).Aggregate((long)1, (acc, x) => acc*x);
+}
+
+#!csharp
+
+expr.Matches(string.Join("",input)).Select(x => x.Value).Select(x => multiply(x)).Aggregate((long)0, (acc, x) => acc + x)
+
+#!csharp
+
+var test_input = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
+
+#!csharp
+
+expr.Matches(test_input).Select(x => x.Value).Select(x => multiply(x)).Aggregate((long)0, (acc, x) => acc + x)
+
+#!csharp
+
+var do_muls = new Regex("don't\\(\\).+?do\\(\\).");
+
+#!csharp
+
+var end_input = string.Join("",input);
+
+#!csharp
+
+var m = do_muls.Match(end_input);
+
+#!csharp
+
+while(m.Success){
+    Console.WriteLine(m.Value);
+    m = m.NextMatch();
+}
+
+#!csharp
+
+do_muls.Replace(end_input, "")
+
+#!csharp
+
+int i = end_input.IndexOf("don't()");
+
+#!csharp
+
+string remove_disabled(string str){
+    int i = str.IndexOf("don't()");
+    Console.WriteLine(i);
+    while(i >= 0 && i < end_input.Count()){
+        int next_do = str.IndexOf("do()", i);
+        Console.WriteLine(next_do);
+        if(next_do > 0){
+            str = str.Remove(i, next_do - i);
+        }
+        i = str.IndexOf("don't()");
+    }
+
+    return str;
+}
+
+#!csharp
+
+expr.Matches(remove_disabled(end_input)).Select(x => x.Value).Select(x => multiply(x)).Aggregate((long)0, (acc, x) => acc + x)
